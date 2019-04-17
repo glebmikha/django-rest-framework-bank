@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Face App</title>
+</head>
+<body>
+    <form action="" method="POST">
+        <input type="text" name="image_url">
+        <input type="submit">
+        {% csrf_token %}
+    </form>
+    {{ data }}
+</body>
+</html>
