@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="{% static 'face/style.css' %}">
     <title>Face App</title>
 </head>
 <body>
@@ -13,8 +15,10 @@
         {% csrf_token %}
     </form>
     
+    <h1>приветики</h1>
+
     {% for image_url in image_urls %}
-        <div>{{ image_url.image_url }}</div>
+        <img src="{{ image_url.image_url }}">
     {% endfor %}
 
 </body>
