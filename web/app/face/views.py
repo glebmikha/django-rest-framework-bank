@@ -5,12 +5,13 @@ from imutils import url_to_image
 
 face_cascade = cv2.CascadeClassifier('/haarcascade_frontalface_default.xml')
 
+
 def index(request):
     if request.method == 'POST':
 
         url = models.Url.objects.create(
             image_url=request.POST.get('image_url', ''))
-   
+
         img = url_to_image(request.POST.get('image_url', ''))
         ih, iw, _ = img.shape
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -35,3 +36,9 @@ def index(request):
 
     context = {'image_urls': urls}
     return render(request, 'face/index.html', context)
+
+
+def delete(request, url_id):
+    item = models.Url.objects.get(pk=url_id)
+    item.delete()
+    return redirect('/face')

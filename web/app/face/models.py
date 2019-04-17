@@ -10,4 +10,4 @@ class BoundingBox(models.Model):
     right = models.DecimalField(decimal_places=3, max_digits=5)
     bottom = models.DecimalField(decimal_places=3, max_digits=5)
     left = models.DecimalField(decimal_places=3, max_digits=5)
-    image = models.ForeignKey(Url, on_delete='CASCADE')
+    image = models.ForeignKey(Url, on_delete=models.CASCADE)

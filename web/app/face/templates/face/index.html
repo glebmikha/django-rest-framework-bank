@@ -26,6 +26,7 @@
                     <div class="bounding-box" style="top: {{ bb.top }}%; right: {{ bb.right }}%; bottom: {{ bb.bottom }}%; left: {{ bb.left }}%;"></div>
                
                 {% endfor %}
+                <a href="{% url 'delete' image_url.id %}" class="btn-delete">delete</a>
             </div>
                
             {% endfor %}
