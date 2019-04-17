@@ -9,17 +9,24 @@
     <title>Face App</title>
 </head>
 <body>
-    <form action="" method="POST">
-        <input type="text" name="image_url">
-        <input type="submit">
-        {% csrf_token %}
-    </form>
-    
-    <h1>приветики</h1>
+    <div class="wrapper">
 
-    {% for image_url in image_urls %}
-        <img src="{{ image_url.image_url }}">
-    {% endfor %}
+        <form action="" method="POST">
+            <input type="text" name="image_url">
+            <input type="submit">
+            {% csrf_token %}
+        </form>
+        
+        <div class="galery">
 
+            {% for image_url in image_urls %}
+                <div class="image-container">
+                <img src="{{ image_url.image_url }}">
+                <div class="bounding-box" style="top: 40%; right: 40%; bottom: 40%; left: 40%;"></div>
+                </div>
+            {% endfor %}
+
+        </div>
+</div>
 </body>
 </html>

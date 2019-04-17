@@ -1,3 +1,47 @@
-h1 {
-    color: black
+* {
+    padding: 0;
+    margin: 0;
 }
+
+.wrapper {
+    display: grid;
+    margin: 20px 40px
+}
+
+form {
+    display: grid;
+    grid-template-columns: 90% auto;
+    margin-bottom: 0.8rem;
+}
+
+img {
+    width: 100%;
+}
+
+.galery {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+}
+
+.image-container {
+    position: relative;
+}
+
+
+.bounding-box {
+    position: absolute;
+    box-shadow: 0 0 0 3px #149df2 inset;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    cursor: pointer;
+}
+
+@media (min-width: 700px) {
+    .galery {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 15px;
+    }
+  }
