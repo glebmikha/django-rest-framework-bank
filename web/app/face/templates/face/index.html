@@ -22,8 +22,12 @@
             {% for image_url in image_urls %}
                 <div class="image-container">
                 <img src="{{ image_url.image_url }}">
-                <div class="bounding-box" style="top: 40%; right: 40%; bottom: 40%; left: 40%;"></div>
-                </div>
+                {% for bb in image_url.boundingbox_set.all %}
+                    <div class="bounding-box" style="top: {{ bb.top }}%; right: {{ bb.right }}%; bottom: {{ bb.bottom }}%; left: {{ bb.left }}%;"></div>
+               
+                {% endfor %}
+            </div>
+               
             {% endfor %}
 
         </div>
