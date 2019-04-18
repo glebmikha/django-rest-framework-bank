@@ -1,0 +1,31 @@
+version: "3"
+services:
+  web:
+    build: ./web
+    expose:
+      - 8000
+    volumes:
+      - static_volume:/vol/web/static
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      - DEBUG=0
+  db:
+    image: postgres:10-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/vol/web/static
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+  
+volumes:
+  postgres_data:
+  static_volume:
