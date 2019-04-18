@@ -16,7 +16,7 @@ class FaceTest(TestCase):
         BoundingBox.objects.create(top=1, bottom=1, right=1, left=1, image=url)
 
         urls = Url.objects.all()
-        bbs = BoundingBox.objects.all()     
+        bbs = BoundingBox.objects.all()
 
         self.client.get(reverse('delete', kwargs={'url_id': url.id}))
         urls = Url.objects.all()
