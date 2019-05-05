@@ -16,7 +16,6 @@ services:
     image: postgres:10-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-
   nginx:
     build: ./nginx
     volumes:
@@ -25,7 +24,7 @@ services:
       - "80:80"
     depends_on:
       - web
-  
+
 volumes:
   postgres_data:
   static_volume:
