@@ -11,7 +11,7 @@ services:
       - db
     env_file: .env
     environment:
-      - DEBUG=0
+      - DEBUG=FASLE
   db:
     image: postgres:10-alpine
     volumes:

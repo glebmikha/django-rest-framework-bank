@@ -13,6 +13,10 @@ fi
 
 echo "run migrations and static"
 python manage.py migrate
-python manage.py collectstatic --no-input
+
+if [ "$DEBUG" = "FASLE" ] 
+then
+	 python manage.py collectstatic --no-input
+fi
 
 exec "$@"
