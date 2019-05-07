@@ -6,6 +6,7 @@ services:
       - 8000
     volumes:
       - static_volume:/vol/web/static
+      - media_volume:/vol/web/media
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
@@ -20,6 +21,7 @@ services:
     build: ./nginx
     volumes:
       - static_volume:/vol/web/static
+      - media_volume:/vol/web/media
     ports:
       - "80:80"
     depends_on:
@@ -28,3 +30,4 @@ services:
 volumes:
   postgres_data:
   static_volume:
+  media_volume:

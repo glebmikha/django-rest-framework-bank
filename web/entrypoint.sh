@@ -11,7 +11,7 @@ then
     echo "PostgreSQL started"
 fi
 
-if [ "$DEBUG" = "FASLE" ] 
+if [ "$DEBUG" = "FALSE" ] 
 then
   echo "run migrations and static"
   python manage.py migrate
