@@ -7,5 +7,5 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ('id', 'fname', 'lname', 'city', 'house', 'image')
-        read_only_fields = ('id',)
+        fields = ('id', 'fname', 'lname', 'city', 'house', 'image', )
+        read_only_fields = ('id', )

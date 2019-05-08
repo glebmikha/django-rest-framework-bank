@@ -4,6 +4,8 @@ from .models import Customer
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.mixins import CreateModelMixin
+from rest_framework import viewsets
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -34,7 +36,8 @@ class CustomerDetail(generics.RetrieveUpdateAPIView):
         return self.queryset.filter(user=self.request.user)
 
 
-class CustomerDetail2(generics.RetrieveUpdateAPIView):
+# class CustomerDetail2(generics.RetrieveUpdateAPIView):
+class CustomerDetail2(viewsets.ModelViewSet):
     """Single end point for get and put, no pk needed, auth user is used
     for filter"""
     serializer_class = CustomerSerializer
@@ -42,5 +45,10 @@ class CustomerDetail2(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated, )
     queryset = Customer.objects.all()
 
-    def get_object(self):
-        return self.queryset.filter(user=self.request.user).first()
+    def perform_create(self, serializer):
+        """Create a new recipe"""
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        """Return object for current authenticated user only"""
+        return self.queryset.filter(user=self.request.user)

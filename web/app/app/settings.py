@@ -46,8 +46,10 @@ INSTALLED_APPS = [
     'rest_auth',
     'django.contrib.sites',  # from offial docs, needed for registration
     'allauth',
-    'allauth.account',
+    'allauth.account',  # fixes bug with django_sites when running tests
+    # https://github.com/pennersr/django-allauth/issues/1817
     'rest_auth.registration',
+    'allauth.socialaccount',
 ]
 
 MIDDLEWARE = [

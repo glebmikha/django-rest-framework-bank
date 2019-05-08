@@ -14,3 +14,7 @@ services:
       - DEBUG=TRUE
   db:
     image: postgres:10-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+volumes:
+  postgres_data:
