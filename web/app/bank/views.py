@@ -4,7 +4,6 @@ from .models import Customer
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.mixins import CreateModelMixin
 from rest_framework import viewsets
 
 
@@ -36,10 +35,9 @@ class CustomerDetail(generics.RetrieveUpdateAPIView):
         return self.queryset.filter(user=self.request.user)
 
 
-# class CustomerDetail2(generics.RetrieveUpdateAPIView):
 class CustomerDetail2(viewsets.ModelViewSet):
-    """Single end point for get and put, no pk needed, auth user is used
-    for filter"""
+    """Example of view set. Put and patch avalible only via pk
+    and urls should be configured via routes"""
     serializer_class = CustomerSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, )
@@ -52,3 +50,17 @@ class CustomerDetail2(viewsets.ModelViewSet):
     def get_queryset(self):
         """Return object for current authenticated user only"""
         return self.queryset.filter(user=self.request.user)
+
+
+class CustomerDetail3(generics.RetrieveUpdateAPIView):
+    """Single end point for get and put, no pk needed, auth user is used
+    for filter. Put works as create!!! You don't even need to add createmodel
+    mixin.
+    """
+    serializer_class = CustomerSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, )
+    queryset = Customer.objects.all()
+
+    def get_object(self):
+        return self.queryset.filter(user=self.request.user).first()

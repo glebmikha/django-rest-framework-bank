@@ -15,7 +15,7 @@ from bank.models import Customer
 
 from bank.serializers import CustomerSerializer
 
-CUSTOMER_URL = reverse('bank:customer-list')
+CUSTOMER_URL = reverse('bank:customer')
 
 
 def image_upload_url(recipe_id):
@@ -77,7 +77,7 @@ class PrivateCustomerApiTests(TestCase):
         serializer = CustomerSerializer(customer, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data, serializer.data[0])
 
     def test_customer_limited_to_user(self):
         """Test retrieving customer for user"""
@@ -96,12 +96,12 @@ class PrivateCustomerApiTests(TestCase):
         serializer = CustomerSerializer(customers, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
-        self.assertEqual(res.data, serializer.data)
+        # self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data, serializer.data[0])
 
     # find best prictices for creating profile tables w/ drf
 
-    def test_create_basic_customer(self):
+    def test_create_customer(self):
         """Test creating customer"""
         payload = {
             'fname': 'Ned',
@@ -110,9 +110,9 @@ class PrivateCustomerApiTests(TestCase):
             'house': 'Stark',
 
         }
-        res = self.client.post(CUSTOMER_URL, payload)
+        res = self.client.put(CUSTOMER_URL, payload)
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         customer = Customer.objects.get(id=res.data['id'])
         for key in payload.keys():
             self.assertEqual(payload[key], getattr(customer, key))
