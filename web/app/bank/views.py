@@ -1,5 +1,5 @@
-from .serializers import CustomerSerializer
-from .models import Customer
+from .serializers import CustomerSerializer, AccountSerializer
+from .models import Customer, Account
 
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
@@ -44,7 +44,7 @@ class CustomerDetail2(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
 
     def perform_create(self, serializer):
-        """Create a new recipe"""
+        """Create a new customer"""
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
@@ -64,3 +64,18 @@ class CustomerDetail3(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.queryset.filter(user=self.request.user).first()
+
+
+class AccountViewSet(viewsets.ModelViewSet):
+    serializer_class = AccountSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, )
+    queryset = Account.objects.all()
+
+    def perform_create(self, serializer):
+        """Create a new account"""
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        """Return object for current authenticated user only"""
+        return self.queryset.filter(user=self.request.user)

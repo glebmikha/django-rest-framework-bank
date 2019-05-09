@@ -1,9 +1,8 @@
 from rest_framework import serializers
-from bank.models import Customer
+from bank.models import Customer, Account
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    """Serializer for tag objects"""
 
     class Meta:
         model = Customer
@@ -16,3 +15,13 @@ class CustomerSerializer(serializers.ModelSerializer):
         # in-drfdjango-rest-framework-null-value-in-column-author-id-violates-not-nul
         validated_data['user_id'] = self.context['request'].user.id
         return super(CustomerSerializer, self).create(validated_data)
+
+
+class AccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Account
+        fields = ('id', 'balance')
+        # balance is read only, because i don't want someone create account
+        # with money
+        read_only_fields = ('id', 'balance')
