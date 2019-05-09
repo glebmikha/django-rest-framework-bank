@@ -15,6 +15,7 @@ from bank.models import Customer
 
 from bank.serializers import CustomerSerializer
 
+
 CUSTOMER_URL = reverse('bank:customer')
 
 
@@ -99,8 +100,6 @@ class PrivateCustomerApiTests(TestCase):
         # self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data, serializer.data[0])
 
-    # find best prictices for creating profile tables w/ drf
-
     def test_create_customer(self):
         """Test creating customer"""
         payload = {
@@ -117,88 +116,87 @@ class PrivateCustomerApiTests(TestCase):
         for key in payload.keys():
             self.assertEqual(payload[key], getattr(customer, key))
 
-    # def test_create_recipe_with_tags(self):
-    #     """Test creating a recipe with tags"""
-    #     tag1 = sample_tag(user=self.user, name='Tag 1')
-    #     tag2 = sample_tag(user=self.user, name='Tag 2')
-    #     payload = {
-    #         'title': 'Test recipe with two tags',
-    #         'tags': [tag1.id, tag2.id],
-    #         'time_minutes': 30,
-    #         'price': 10.00
-    #     }
-    #     res = self.client.post(RECIPE_URL, payload)
+    def test_create_customer_with_image(self):
+        """Test creating customer"""
 
-    #     self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-    #     recipe = Recipe.objects.get(id=res.data['id'])
-    #     tags = recipe.tags.all()
-    #     self.assertEqual(tags.count(), 2)
-    #     self.assertIn(tag1, tags)
-    #     self.assertIn(tag2, tags)
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new('RGB', (10, 10))
+            img.save(ntf, format='JPEG')
+            ntf.seek(0)
+            payload = {
+                'fname': 'Ned',
+                'lname': 'Stark',
+                'city': 'Winterfell',
+                'house': 'Stark',
+                'image': ntf
+            }
 
-    # def test_create_recipe_with_ingredients(self):
-    #     """Test creating recipe with ingredients"""
-    #     ingredient1 = sample_ingridient(user=self.user, name='Ingredient 1')
-    #     ingredient2 = sample_ingridient(user=self.user, name='Ingredient 2')
-    #     payload = {
-    #         'title': 'Test recipe with ingredients',
-    #         'ingredients': [ingredient1.id, ingredient2.id],
-    #         'time_minutes': 45,
-    #         'price': 15.00
-    #     }
+            res = self.client.put(CUSTOMER_URL, payload, format='multipart')
 
-    #     res = self.client.post(RECIPE_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        customer = Customer.objects.get(id=res.data['id'])
+        for key in payload.keys():
+            if key != 'image':
+                self.assertEqual(payload[key], getattr(customer, key))
 
-    #     self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-    #     recipe = Recipe.objects.get(id=res.data['id'])
-    #     ingredients = recipe.ingredients.all()
-    #     self.assertEqual(ingredients.count(), 2)
-    #     self.assertIn(ingredient1, ingredients)
-    #     self.assertIn(ingredient2, ingredients)
+        self.assertIn('image', res.data)
+        self.assertTrue(os.path.exists(customer.image.path))
+        customer.image.delete()
 
-    # def test_partial_update_recipe(self):
-    #     """Test updating recipe with patch"""
-    #     recipe = sample_recipe(user=self.user)
-    #     recipe.tags.add(sample_tag(user=self.user))
+    def test_partial_update_cuptomer(self):
+        """Test updating customer with patch"""
 
-    #     new_tag = sample_tag(user=self.user, name='Carry')
+        customer = sample_customer(user=self.user)
 
-    #     payload = {
-    #         'title': 'Chiken tikka',
-    #         'tags': [new_tag.id]
-    #     }
+        payload = {
+            'fname': 'Nad',
+            'city': 'Moscow'
+        }
 
-    #     url = detail_url(recipe.id)
+        res = self.client.patch(CUSTOMER_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    #     self.client.patch(url, payload)
+        customer.refresh_from_db()
 
-    #     recipe.refresh_from_db()
+        self.assertEqual(customer.city, payload['city'])
 
-    #     self.assertEqual(recipe.title, payload['title'])
+    def test_full_update_customer(self):
+        """Test recipe update with put"""
+        # create customer with image
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new('RGB', (10, 10))
+            img.save(ntf, format='JPEG')
+            ntf.seek(0)
 
-    #     tags = recipe.tags.all()
-    #     self.assertEqual(len(tags), 1)
+            customer = sample_customer(user=self.user)
+            customer.image.save('abc.jpg', ntf)
 
-    #     self.assertIn(new_tag, tags)
+        # full update
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new('RGB', (10, 10))
+            img.save(ntf, format='JPEG')
+            ntf.seek(0)
+            payload = {
+                'fname': 'Ned',
+                'lname': 'Stark',
+                'city': 'Balashiha',
+                'house': 'Stark',
+                'image': ntf
+            }
 
-    # def test_full_update_recipe(self):
-    #     """Test recipe update with put"""
-    #     recipe = sample_recipe(user=self.user)
-    #     recipe.tags.add(sample_tag(user=self.user))
-    #     payload = {
-    #         'title': 'Spagetti carbonara',
-    #         'time_minutes': 25,
-    #         'price': 5.00
-    #     }
+            res = self.client.put(CUSTOMER_URL, payload, format='multipart')
 
-    #     url = detail_url(recipe.id)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    #     self.client.put(url, payload)
+        customer.refresh_from_db()
 
-    #     recipe.refresh_from_db()
+        self.assertEqual(customer.city, payload['city'])
+        self.assertTrue(os.path.exists(customer.image.path))
+        customer.image.delete()
 
-    #     self.assertEqual(recipe.title, payload['title'])
-    #     self.assertEqual(recipe.time_minutes, payload['time_minutes'])
-    #     self.assertEqual(recipe.price, payload['price'])
-    #     tags = recipe.tags.all()
-    #     self.assertEqual(len(tags), 0)
+        try:
+            os.remove("/vol/web/media/upload/customer/abc.jpg")
+        except Exception as e:
+            print(e)
+
+    # mb add test for retrieving images from http?
