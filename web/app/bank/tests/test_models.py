@@ -34,3 +34,20 @@ class ModelTest(TestCase):
         exp_path = f'upload/customer/{uuid}.jpg'
 
         self.assertEqual(file_path, exp_path)
+
+    def test_account_str(self):
+        """Test the customer string representation"""
+
+        test_user = sample_user()
+
+        account1 = models.Account.objects.create(
+            user=test_user,
+        )
+
+        account2 = models.Account.objects.create(
+            user=test_user,
+            balance=2000.32
+        )
+
+        self.assertEqual(str(account1), 'Balance is 0')
+        self.assertEqual(str(account2), 'Balance is 2000.32')

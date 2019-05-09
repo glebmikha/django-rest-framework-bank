@@ -1,5 +1,5 @@
 make_migr:
-	docker-compose run --rm web sh -c "python manage.py makemigrations sites"
+	docker-compose run --rm web sh -c "python manage.py makemigrations bank"
 migr:
 	docker-compose run --rm web sh -c "python manage.py migrate"
 test:

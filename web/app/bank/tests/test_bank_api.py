@@ -187,4 +187,5 @@ class PrivateCustomerApiTests(TestCase):
         try:
             os.remove("/vol/web/media/upload/customer/abc.jpg")
         except Exception as e:
-            print(e)
+            if e:
+                pass

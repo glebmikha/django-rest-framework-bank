@@ -13,7 +13,6 @@ def customer_image_file_path(instande, filename):
 
 
 class Customer(models.Model):
-    """Ingredient to be used for recipe"""
     fname = models.CharField(max_length=255)
     lname = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
@@ -27,3 +26,19 @@ class Customer(models.Model):
 
     def __str__(self):
         return f'{self.fname} {self.lname}'
+
+
+class Account(models.Model):
+    balance = models.DecimalField(
+        default=0,
+        max_digits=12,
+        decimal_places=2
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f'Balance is {str(self.balance)}'
