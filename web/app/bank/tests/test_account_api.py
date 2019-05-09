@@ -94,21 +94,23 @@ class PrivateCustomerApiTests(TestCase):
 
     def test_partial_update_account(self):
 
-        sample_account(user=self.user)
+        account = sample_account(user=self.user)
+        url = ACCOUNT_URL + str(account.id) + '/'
 
         payload = {
             'balance': 9999999
         }
 
-        res = self.client.patch(ACCOUNT_URL, payload)
-        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        res = self.client.patch(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_full_update_account(self):
-        sample_account(user=self.user)
+        account = sample_account(user=self.user)
+        url = ACCOUNT_URL + str(account.id) + '/'
 
         payload = {
             'balance': 9999999
         }
 
-        res = self.client.put(ACCOUNT_URL, payload)
-        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        res = self.client.put(url, payload)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

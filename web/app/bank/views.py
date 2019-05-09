@@ -1,10 +1,8 @@
 from .serializers import CustomerSerializer, AccountSerializer
 from .models import Customer, Account
-
-from rest_framework import generics
+from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -66,7 +64,9 @@ class CustomerDetail3(generics.RetrieveUpdateAPIView):
         return self.queryset.filter(user=self.request.user).first()
 
 
-class AccountViewSet(viewsets.ModelViewSet):
+class AccountViewSet(viewsets.GenericViewSet,
+                     mixins.ListModelMixin,
+                     mixins.CreateModelMixin):
     serializer_class = AccountSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, )
