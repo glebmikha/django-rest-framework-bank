@@ -19,16 +19,6 @@ from bank.serializers import CustomerSerializer
 CUSTOMER_URL = reverse('bank:customer')
 
 
-def image_upload_url(recipe_id):
-    """Return url for recipe image upload"""
-    return reverse('recipe:recipe-upload-image', args=[recipe_id])
-
-
-def detail_url(recipe_id):
-    """Return recipe detail url"""
-    return reverse('recipe:recipe-detail', args=[recipe_id])
-
-
 def sample_customer(user, **params):
     """Create and return a sample customer"""
     defaults = {
@@ -198,5 +188,3 @@ class PrivateCustomerApiTests(TestCase):
             os.remove("/vol/web/media/upload/customer/abc.jpg")
         except Exception as e:
             print(e)
-
-    # mb add test for retrieving images from http?
