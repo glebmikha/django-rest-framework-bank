@@ -51,3 +51,22 @@ class ModelTest(TestCase):
 
         self.assertEqual(str(account1), 'Balance is 0')
         self.assertEqual(str(account2), 'Balance is 2000.32')
+
+    def test_action_str(self):
+        """Test the action string representation"""
+
+        test_user = sample_user()
+
+        account = models.Account.objects.create(
+            user=test_user,
+        )
+
+        account_id = account.id
+
+        action1 = models.Action.objects.create(
+            amount=1000,
+            account=account
+        )
+
+        self.assertEqual(
+            str(action1), f'Account number {account_id} was changed on 1000')

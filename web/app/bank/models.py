@@ -37,8 +37,26 @@ class Account(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT  # we cannot delete user with money
     )
 
     def __str__(self):
         return f'Balance is {str(self.balance)}'
+
+
+class Action(models.Model):
+    amount = models.DecimalField(
+        default=0,
+        max_digits=12,
+        decimal_places=2
+    )
+    date = models.DateTimeField(auto_now_add=True)
+
+    account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT
+    )
+
+    def __str__(self):
+        return f'Account number {self.account.id} ' +\
+            f'was changed on {str(self.amount)}'
