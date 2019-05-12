@@ -81,7 +81,6 @@ class AccountViewSet(viewsets.GenericViewSet,
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-        print(self.request.user)
         return self.queryset.filter(user=self.request.user)
 
 
@@ -96,7 +95,6 @@ class ActionViewSet(viewsets.GenericViewSet,
     def get_queryset(self):
         """Return object for current authenticated user only"""
         # get account of user
-        print(self.request.user)
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(account__in=accounts)
 

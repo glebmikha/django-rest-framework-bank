@@ -46,7 +46,6 @@ class Account(models.Model):
 
 class Action(models.Model):
     amount = models.DecimalField(
-        default=0,
         max_digits=12,
         decimal_places=2
     )
