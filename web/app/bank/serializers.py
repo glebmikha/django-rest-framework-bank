@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from bank.models import Customer, Account
+from bank.models import Customer, Account, Action
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -25,3 +25,26 @@ class AccountSerializer(serializers.ModelSerializer):
         # balance is read only, because i don't want someone create account
         # with money
         read_only_fields = ('id', 'balance')
+
+
+class ActionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Action
+        fields = ('id', 'account', 'amount', 'date')
+        read_only_fields = ('id', 'date')
+
+    def create(self, validated_data):
+        # check if enough money to withdraw
+        # mb it's better done by
+        # https://medium.com/profil-software-blog/10-\
+        # things-you-need-to-know-to-effectively-use-django-rest-framework-7db7728910e0
+        if validated_data['account'].balance + validated_data['amount'] > 0:
+            validated_data['account'].balance += validated_data['amount']
+            validated_data['account'].save()
+        else:
+            raise serializers.ValidationError(
+                ('Not enough money')
+            )
+
+        return super(ActionSerializer, self).create(validated_data)
