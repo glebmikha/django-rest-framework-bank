@@ -112,7 +112,6 @@ class PrivateCustomerApiTests(TestCase):
         self.account.balance = 1000
         self.account.save()
         balance_before = self.account.balance
-        print(balance_before)
 
         res = self.client.post(ACTION_URL, payload)
 
@@ -135,47 +134,19 @@ class PrivateCustomerApiTests(TestCase):
 
         self.account.balance = 0
         self.account.save()
-        balance_before = self.account.balance
-        print(balance_before)
 
         res = self.client.post(ACTION_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_listing_actions_from_several_accounts(self):
+        account2 = sample_account(user=self.user)
 
-#     def test_create_account_always_zero(self):
-#         payload = {'balance': 20000.232}
-#         res = self.client.post(ACCOUNT_URL, payload)
+        Action.objects.create(account=self.account,
+                              amount=500)
+        Action.objects.create(account=account2,
+                              amount=500)
 
-#         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-#         account = Account.objects.get(id=res.data['id'])
-#         self.assertEqual(0, account.balance)
+        res = self.client.get(ACTION_URL)
 
-#     def test_partial_update_account(self):
-
-#         account = sample_account(user=self.user)
-#         url = ACCOUNT_URL + str(account.id) + '/'
-
-#         payload = {
-#             'balance': 9999999
-#         }
-
-#         res = self.client.patch(url, payload)
-#         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
-
-#         res = self.client.patch(ACCOUNT_URL, payload)
-#         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-#     def test_full_update_account(self):
-#         account = sample_account(user=self.user)
-#         url = ACCOUNT_URL + str(account.id) + '/'
-
-#         payload = {
-#             'balance': 9999999
-#         }
-
-#         res = self.client.put(url, payload)
-#         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
-
-#         res = self.client.put(ACCOUNT_URL, payload)
-#         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(len(res.data), 2)
