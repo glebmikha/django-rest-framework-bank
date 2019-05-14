@@ -11,6 +11,7 @@ router = DefaultRouter()
 router.register('acustomer', views.CustomerDetail2)
 router.register('account', views.AccountViewSet)
 router.register('action', views.ActionViewSet)
+router.register('transaction', views.TransactionViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

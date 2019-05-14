@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from bank.models import Customer, Account, Action
+from bank.models import Customer, Account, Action, Transaction
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -48,3 +48,11 @@ class ActionSerializer(serializers.ModelSerializer):
             )
 
         return super(ActionSerializer, self).create(validated_data)
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        fields = ('id', 'account', 'date', 'merchant', 'amount')
+        read_only_fields = ('id', )

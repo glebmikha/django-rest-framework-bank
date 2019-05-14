@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 import uuid
 import os
+from django.db import transaction
 
 
 def customer_image_file_path(instande, filename):
@@ -59,3 +60,35 @@ class Action(models.Model):
     def __str__(self):
         return f'Account number {self.account.id} ' +\
             f'was changed on {str(self.amount)}'
+
+
+class Transaction(models.Model):
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+    date = models.DateTimeField(auto_now_add=True)
+
+    account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT
+    )
+
+    merchant = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'Account number {self.account.id} ' +\
+            f'sent {str(self.amount)} to {self.merchant}'
+
+    @classmethod
+    def make_transaction(cls, amount, account, merchant):
+        if account.balance < amount:
+            raise(ValueError)
+
+        with transaction.atomic():
+            account.balance -= amount
+            account.save()
+            tran = cls.objects.create(
+                amount=amount, account=account, merchant=merchant)
+
+        return account, tran

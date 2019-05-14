@@ -1,6 +1,6 @@
 from .serializers import (CustomerSerializer, AccountSerializer,
-                          ActionSerializer)
-from .models import Customer, Account, Action
+                          ActionSerializer, TransactionSerializer)
+from .models import Customer, Account, Action, Transaction
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -117,3 +117,43 @@ class ActionViewSet(viewsets.GenericViewSet,
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED,
                         headers=headers)
+
+
+class TransactionViewSet(viewsets.GenericViewSet,
+                         mixins.ListModelMixin,
+                         mixins.CreateModelMixin):
+    serializer_class = TransactionSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, )
+    queryset = Transaction.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            account = Account.objects.filter(
+                user=self.request.user).get(pk=self.request.data['account'])
+        except Exception as e:
+            print(e)
+            content = {'error': 'No such account'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(account=account)
+
+        try:
+            Transaction.make_transaction(**serializer.validated_data)
+        except ValueError:
+            content = {'error': 'Not enough money'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+    def get_queryset(self):
+        """Return object for current authenticated user only"""
+        # get account of user
+        accounts = Account.objects.filter(user=self.request.user)
+        return self.queryset.filter(account__in=accounts)
