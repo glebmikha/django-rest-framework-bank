@@ -1,11 +1,13 @@
 from .serializers import (CustomerSerializer, AccountSerializer,
                           ActionSerializer, TransactionSerializer)
-from .models import Customer, Account, Action, Transaction
+from .models import Customer, Account, Action, Transaction, Transfer
+from rest_framework import serializers
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from .services import make_transfer, filter_user_account, check_account_exists
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -158,3 +160,56 @@ class TransactionViewSet(viewsets.GenericViewSet,
         # get account of user
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(account__in=accounts)
+
+
+class TransferViewSet(viewsets.GenericViewSet,
+                      mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin):
+    class Serializer(serializers.ModelSerializer):
+        class Meta:
+            model = Transfer
+            fields = ('id', 'from_account', 'to_account', 'amount')
+            read_only_fields = ('id', )
+
+    serializer_class = Serializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, )
+    queryset = Transfer.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=False)
+
+        try:
+            from_account = filter_user_account(
+                self.request.user,
+                self.request.data['from_account'])
+        except ValueError:
+            content = {'error': 'No such account'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            to_account = check_account_exists(self.request.data['to_account'])
+        except ValueError:
+            content = {'error': 'No such account to transfer'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            make_transfer(
+                from_account,
+                to_account,
+                self.request.data['amount'])
+        except ValueError:
+            content = {'error': 'Not enough money'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+    def get_queryset(self):
+        """Return object for current authenticated user only"""
+        # get account of user
+        accounts = Account.objects.filter(user=self.request.user)
+        return self.queryset.filter(from_account__in=accounts)

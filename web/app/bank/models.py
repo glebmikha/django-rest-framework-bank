@@ -92,3 +92,23 @@ class Transaction(models.Model):
                 amount=amount, account=account, merchant=merchant)
 
         return account, tran
+
+
+class Transfer(models.Model):
+
+    from_account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name='from_account'
+    )
+
+    to_account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name='to_account'
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
