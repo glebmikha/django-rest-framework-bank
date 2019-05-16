@@ -121,7 +121,8 @@ class ActionViewSet(viewsets.GenericViewSet,
 
 class TransactionViewSet(viewsets.GenericViewSet,
                          mixins.ListModelMixin,
-                         mixins.CreateModelMixin):
+                         mixins.CreateModelMixin,
+                         mixins.RetrieveModelMixin):
     serializer_class = TransactionSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, )
