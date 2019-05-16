@@ -70,3 +70,53 @@ class ModelTest(TestCase):
 
         self.assertEqual(
             str(action1), f'Account number {account_id} was changed on 1000')
+
+    def test_make_transaction_success(self):
+        """Make succesful transaction"""
+        test_user = sample_user()
+
+        initial_balance = 1000
+        trans_amount = 500
+
+        account = models.Account.objects.create(
+            user=test_user,
+            balance=initial_balance
+        )
+
+        models.Transaction.make_transaction(
+            account=account,
+            amount=trans_amount,
+            merchant='bk'
+        )
+
+        account.refresh_from_db()
+
+        expected_balance = initial_balance - trans_amount
+
+        transactions = models.Transaction.objects.all()
+
+        self.assertEqual(expected_balance, account.balance)
+        self.assertEqual(len(transactions), 1)
+
+    def test_make_transaction_failed(self):
+        """Make failed transaction"""
+        test_user = sample_user()
+
+        initial_balance = 1000
+        trans_amount = 1500
+
+        account = models.Account.objects.create(
+            user=test_user,
+            balance=initial_balance
+        )
+
+        try:
+            models.Transaction.make_transaction(
+                account=account,
+                amount=trans_amount,
+                merchant='bk'
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("ValueError was not raised")

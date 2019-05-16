@@ -83,7 +83,7 @@ class Transaction(models.Model):
     @classmethod
     def make_transaction(cls, amount, account, merchant):
         if account.balance < amount:
-            raise(ValueError)
+            raise(ValueError('Not enough money'))
 
         with transaction.atomic():
             account.balance -= amount
