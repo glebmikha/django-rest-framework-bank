@@ -17,6 +17,7 @@ router.register('transfer', views.TransferViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('customer/', views.CustomerDetail3.as_view(), name='customer'),
+    path('transfer_alt/', views.CreateTransferView.as_view())
 ]
 
 # not working with routes. I thing because this is included in routes

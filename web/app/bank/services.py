@@ -1,5 +1,7 @@
 from .models import Account, Transfer
 from django.db import transaction
+# from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 
 def make_transfer(from_account, to_account, amount):
@@ -27,9 +29,8 @@ def filter_user_account(user, account_id):
     try:
         account = Account.objects.filter(
             user=user).get(pk=account_id)
-    except Exception as e:
-        print(e)
-        raise(ValueError('No such account'))
+    except (Account.DoesNotExist):
+        raise ValidationError("Account doesn't exist")
 
     return account
 

@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .services import make_transfer, filter_user_account, check_account_exists
+from .mixins import ServiceExceptionHandlerMixin
+from rest_framework.views import APIView
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -165,7 +167,9 @@ class TransactionViewSet(viewsets.GenericViewSet,
 class TransferViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin,
                       mixins.CreateModelMixin,
-                      mixins.RetrieveModelMixin):
+                      mixins.RetrieveModelMixin,
+                      ServiceExceptionHandlerMixin):
+
     class Serializer(serializers.ModelSerializer):
         class Meta:
             model = Transfer
@@ -181,6 +185,9 @@ class TransferViewSet(viewsets.GenericViewSet,
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=False)
 
+        # there is no call to handle_exception(self, exc) if exeption
+        # it could be done manualy
+
         try:
             from_account = filter_user_account(
                 self.request.user,
@@ -189,11 +196,11 @@ class TransferViewSet(viewsets.GenericViewSet,
             content = {'error': 'No such account'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            to_account = check_account_exists(self.request.data['to_account'])
-        except ValueError:
-            content = {'error': 'No such account to transfer'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        from_account = filter_user_account(
+            self.request.user,
+            self.request.data['from_account'])
+
+        to_account = check_account_exists(self.request.data['to_account'])
 
         try:
             make_transfer(
@@ -213,3 +220,39 @@ class TransferViewSet(viewsets.GenericViewSet,
         # get account of user
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(from_account__in=accounts)
+
+
+class CreateTransferView(
+    ServiceExceptionHandlerMixin,
+    APIView
+):
+
+    class Serializer(serializers.ModelSerializer):
+
+        class Meta:
+            model = Transfer
+            fields = ('id', 'from_account', 'to_account', 'amount')
+            read_only_fields = ('id', )
+
+    # serializer_class = Serializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, )
+    # queryset = Transfer.objects.all()
+
+    def post(self, request):
+        data = request.data
+        serializer = self.Serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        from_account = filter_user_account(
+            self.request.user,
+            self.request.data['from_account'])
+
+        to_account = check_account_exists(self.request.data['to_account'])
+
+        make_transfer(
+            from_account,
+            to_account,
+            self.request.data['amount'])
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
