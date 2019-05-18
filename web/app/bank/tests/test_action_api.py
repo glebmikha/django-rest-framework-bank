@@ -44,7 +44,7 @@ class PrivateCustomerApiTests(TestCase):
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
         self.account = sample_account(user=self.user)
-        self.account.banalce = 1000
+        self.account.balance = 1000
         self.account.save()
 
     def test_retreive_actions(self):

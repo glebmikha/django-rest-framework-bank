@@ -1,0 +1,2 @@
+/app/celerybeat-schedule
+/app/celerybeat.pid

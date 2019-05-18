@@ -25,6 +25,9 @@ services:
     depends_on:
       - db
       - redis
+    env_file: .env
+    environment:
+      - DEBUG=FALSE
 
   celery-beat:
     build: ./web
@@ -34,6 +37,9 @@ services:
     depends_on:
       - db
       - redis
+    env_file: .env
+    environment:
+      - DEBUG=FALSE
 
   db:
     image: postgres:10-alpine
