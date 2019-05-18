@@ -13,10 +13,33 @@ services:
     env_file: .env
     environment:
       - DEBUG=FALSE
+
+  redis:
+    image: "redis:alpine"
+
+  celery:
+    build: ./web
+    command: celery -A app worker -l info
+    volumes:
+      - ./web/app:/app
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build: ./web
+    command: celery -A app beat -l info
+    volumes:
+      - ./web/app:/app
+    depends_on:
+      - db
+      - redis
+
   db:
     image: postgres:10-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+
   nginx:
     build: ./nginx
     volumes:
