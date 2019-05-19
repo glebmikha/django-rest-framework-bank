@@ -18,4 +18,6 @@ then
   python manage.py collectstatic --no-input
 fi
 
+rm -f /app/web/app/celerybeat.pid
+
 exec "$@"
