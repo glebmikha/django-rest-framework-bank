@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from bank.models import Customer, Account, Action, Transaction
+from bank.models import Customer, Account, Action, Transaction, Transfer
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -29,6 +29,16 @@ class AccountSerializer(serializers.ModelSerializer):
 
 class ActionSerializer(serializers.ModelSerializer):
 
+    # customer init to limit choises in browesble api
+    # https://stackoverflow.com/questions/15328632/dynamically-limiting-queryset-of-related-field/20679785
+    # if not, all account will be visible in browesble api. that's a leak. bad.
+
+    def __init__(self, *args, **kwargs):
+        super(ActionSerializer, self).__init__(*args, **kwargs)
+        if 'request' in self.context:
+            self.fields['account'].queryset = self.fields['account']\
+                .queryset.filter(user=self.context['view'].request.user)
+
     class Meta:
         model = Action
         fields = ('id', 'account', 'amount', 'date')
@@ -52,7 +62,29 @@ class ActionSerializer(serializers.ModelSerializer):
 
 class TransactionSerializer(serializers.ModelSerializer):
 
+    def __init__(self, *args, **kwargs):
+        super(TransactionSerializer, self).__init__(*args, **kwargs)
+        if 'request' in self.context:
+            self.fields['account'].queryset = self.fields['account']\
+                .queryset.filter(user=self.context['view'].request.user)
+
     class Meta:
         model = Transaction
         fields = ('id', 'account', 'date', 'merchant', 'amount')
+        read_only_fields = ('id', )
+
+
+class TransferSerializer(serializers.ModelSerializer):
+
+    def __init__(self, *args, **kwargs):
+        super(TransferSerializer, self).__init__(*args, **kwargs)
+        if 'request' in self.context:
+            self.fields['from_account'].queryset = self.fields['from_account']\
+                .queryset.filter(user=self.context['view'].request.user)
+            self.fields['to_account'].queryset = self.fields['to_account']\
+                .queryset.filter(user=self.context['view'].request.user)
+
+    class Meta:
+        model = Transfer
+        fields = ('id', 'from_account', 'to_account', 'amount')
         read_only_fields = ('id', )

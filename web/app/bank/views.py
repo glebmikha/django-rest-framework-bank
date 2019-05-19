@@ -1,7 +1,7 @@
 from .serializers import (CustomerSerializer, AccountSerializer,
-                          ActionSerializer, TransactionSerializer)
+                          ActionSerializer, TransactionSerializer,
+                          TransferSerializer)
 from .models import Customer, Account, Action, Transaction, Transfer
-from rest_framework import serializers
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -170,20 +170,14 @@ class TransferViewSet(viewsets.GenericViewSet,
                       mixins.RetrieveModelMixin,
                       ServiceExceptionHandlerMixin):
 
-    class Serializer(serializers.ModelSerializer):
-        class Meta:
-            model = Transfer
-            fields = ('id', 'from_account', 'to_account', 'amount')
-            read_only_fields = ('id', )
-
-    serializer_class = Serializer
+    serializer_class = TransferSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, )
     queryset = Transfer.objects.all()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=False)
+        serializer.is_valid(raise_exception=True)
 
         # there is no call to handle_exception(self, exc) if exeption
         # it could be done manualy
@@ -206,7 +200,7 @@ class TransferViewSet(viewsets.GenericViewSet,
             make_transfer(
                 from_account,
                 to_account,
-                self.request.data['amount'])
+                float(self.request.data['amount']))
         except ValueError:
             content = {'error': 'Not enough money'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
@@ -217,7 +211,7 @@ class TransferViewSet(viewsets.GenericViewSet,
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-        # get account of user
+        # filter accounts by user
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(from_account__in=accounts)
 
@@ -227,21 +221,17 @@ class CreateTransferView(
     APIView
 ):
 
-    class Serializer(serializers.ModelSerializer):
+    # if i do create this way I don't have to handle exception manualy
+    # ServiceExceptionHandlerMixin do it for me
 
-        class Meta:
-            model = Transfer
-            fields = ('id', 'from_account', 'to_account', 'amount')
-            read_only_fields = ('id', )
-
-    # serializer_class = Serializer
+    serializer_class = TransferSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, )
-    # queryset = Transfer.objects.all()
+    queryset = Transfer.objects.all()
 
     def post(self, request):
         data = request.data
-        serializer = self.Serializer(data=data)
+        serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
 
         from_account = filter_user_account(
@@ -253,6 +243,6 @@ class CreateTransferView(
         make_transfer(
             from_account,
             to_account,
-            self.request.data['amount'])
+            float(self.request.data['amount']))
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

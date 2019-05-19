@@ -20,4 +20,6 @@ fi
 
 rm -f /app/web/app/celerybeat.pid
 
+# you can run celery worker and celery beat from here, all in one container
+
 exec "$@"
