@@ -193,8 +193,11 @@ class TransferViewSet(viewsets.GenericViewSet,
         from_account = filter_user_account(
             self.request.user,
             self.request.data['from_account'])
-
-        to_account = check_account_exists(self.request.data['to_account'])
+        try:
+            to_account = check_account_exists(self.request.data['to_account'])
+        except ValueError:
+            content = {'error': 'No such account'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             make_transfer(

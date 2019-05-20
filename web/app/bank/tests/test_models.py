@@ -49,8 +49,8 @@ class ModelTest(TestCase):
             balance=2000.32
         )
 
-        self.assertEqual(str(account1), 'Balance is 0')
-        self.assertEqual(str(account2), 'Balance is 2000.32')
+        self.assertEqual(str(account1), '1 of test@test.com')
+        self.assertEqual(str(account2), '2 of test@test.com')
 
     def test_action_str(self):
         """Test the action string representation"""

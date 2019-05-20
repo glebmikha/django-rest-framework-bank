@@ -81,8 +81,8 @@ class TransferSerializer(serializers.ModelSerializer):
         if 'request' in self.context:
             self.fields['from_account'].queryset = self.fields['from_account']\
                 .queryset.filter(user=self.context['view'].request.user)
-            self.fields['to_account'].queryset = self.fields['to_account']\
-                .queryset.filter(user=self.context['view'].request.user)
+
+    to_account = serializers.CharField()
 
     class Meta:
         model = Transfer

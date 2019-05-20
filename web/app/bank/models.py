@@ -42,7 +42,7 @@ class Account(models.Model):
     )
 
     def __str__(self):
-        return f'Balance is {str(self.balance)}'
+        return f'{self.id} of {self.user.username}'
 
 
 class Action(models.Model):

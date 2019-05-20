@@ -1,1 +1,1 @@
-# django-data-science-tutorial
+# Django REST framework Bank app
