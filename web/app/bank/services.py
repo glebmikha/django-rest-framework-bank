@@ -12,11 +12,11 @@ def make_transfer(from_account, to_account, amount):
         raise(ValueError('Chose another account'))
 
     with transaction.atomic():
-        from_balance = float(from_account.balance) - amount
+        from_balance = from_account.balance - amount
         from_account.balance = from_balance
         from_account.save()
 
-        to_balance = float(to_account.balance) + amount
+        to_balance = to_account.balance + amount
         to_account.balance = to_balance
         to_account.save()
 

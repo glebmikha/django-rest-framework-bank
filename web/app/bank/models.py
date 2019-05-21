@@ -23,6 +23,7 @@ class Customer(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+
     )
 
     def __str__(self):
@@ -54,7 +55,8 @@ class Action(models.Model):
 
     account = models.ForeignKey(
         Account,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE,
+        related_name='actions',
     )
 
     def __str__(self):
@@ -71,7 +73,7 @@ class Transaction(models.Model):
 
     account = models.ForeignKey(
         Account,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
 
     merchant = models.CharField(max_length=255)
@@ -98,13 +100,13 @@ class Transfer(models.Model):
 
     from_account = models.ForeignKey(
         Account,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='from_account'
     )
 
     to_account = models.ForeignKey(
         Account,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='to_account'
     )
 
@@ -119,7 +121,7 @@ class Interest(models.Model):
 
     account = models.ForeignKey(
         Account,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
 
     amount = models.DecimalField(

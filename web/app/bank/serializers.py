@@ -2,12 +2,25 @@ from rest_framework import serializers
 from bank.models import Customer, Account, Action, Transaction, Transfer
 
 
+class AccountSerializer(serializers.ModelSerializer):
+    # in order to work you should add related_name in Action model
+    actions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Account
+        fields = ('id', 'balance', 'actions')
+        # balance is read only, because i don't want someone create account
+        # with money
+        read_only_fields = ('id', 'balance', 'actions')
+
+
 class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ('id', 'fname', 'lname', 'city', 'house', 'image',)
-        read_only_fields = ('id',)
+        fields = ('id', 'fname', 'lname',
+                  'city', 'house', 'image')
+        read_only_fields = ('id', )
 
     def create(self, validated_data):
         # override standard method to create cumster without pk in url
@@ -15,16 +28,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         # in-drfdjango-rest-framework-null-value-in-column-author-id-violates-not-nul
         validated_data['user_id'] = self.context['request'].user.id
         return super(CustomerSerializer, self).create(validated_data)
-
-
-class AccountSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Account
-        fields = ('id', 'balance')
-        # balance is read only, because i don't want someone create account
-        # with money
-        read_only_fields = ('id', 'balance')
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -83,6 +86,15 @@ class TransferSerializer(serializers.ModelSerializer):
                 .queryset.filter(user=self.context['view'].request.user)
 
     to_account = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            data['to_account'] = Account.objects.get(pk=data['to_account'])
+        except Exception as e:
+            print(e)
+            raise serializers.ValidationError(
+                "No such account from serializer")
+        return data
 
     class Meta:
         model = Transfer

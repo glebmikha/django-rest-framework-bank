@@ -46,3 +46,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
 volumes:
   postgres_data:
+# TIP: docker-compsoe automatically adds folder name as prefix
+# to volumes' names. It could cause problems if you change folder name
+# to control this you can run docker-compose with -p flag
+# example: docker-compose -p "your_prefix" up

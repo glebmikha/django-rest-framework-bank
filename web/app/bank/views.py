@@ -179,31 +179,8 @@ class TransferViewSet(viewsets.GenericViewSet,
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # there is no call to handle_exception(self, exc) if exeption
-        # it could be done manualy
-
         try:
-            from_account = filter_user_account(
-                self.request.user,
-                self.request.data['from_account'])
-        except ValueError:
-            content = {'error': 'No such account'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-        from_account = filter_user_account(
-            self.request.user,
-            self.request.data['from_account'])
-        try:
-            to_account = check_account_exists(self.request.data['to_account'])
-        except ValueError:
-            content = {'error': 'No such account'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            make_transfer(
-                from_account,
-                to_account,
-                float(self.request.data['amount']))
+            make_transfer(**serializer.validated_data)
         except ValueError:
             content = {'error': 'Not enough money'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
