@@ -190,3 +190,29 @@ CELERY_BEAT_SCHEDULE = {
     # },
 
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/vol/web/media/logs/main.log',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'roistat': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
+        },
+    },
+}

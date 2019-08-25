@@ -18,9 +18,13 @@ RUN apk del .tmp-build-deps
 WORKDIR /app
 
 RUN mkdir -p /vol/web/media
+RUN mkdir -p /vol/web/media/logs
 RUN mkdir -p /vol/web/static
 RUN adduser -D user
 RUN chown -R user:user /vol/
+RUN chown -R user:user /vol/web/media/logs
+RUN touch /vol/web/media/logs/main.log
+RUN chown -R user:user /vol/web/media/logs/main.log
 RUN chmod -R 755 /vol/web
 
 USER user

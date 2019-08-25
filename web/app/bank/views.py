@@ -11,6 +11,11 @@ from .services import make_transfer, filter_user_account, check_account_exists
 from .mixins import ServiceExceptionHandlerMixin
 from rest_framework.views import APIView
 
+import logging
+
+# Get an instance of a logger
+logger_roistat = logging.getLogger('roistat')
+
 
 class CustomerList(generics.ListCreateAPIView):
     """Get a list, put and patch are not allowed"""
@@ -75,8 +80,8 @@ class AccountViewSet(viewsets.GenericViewSet,
                      mixins.ListModelMixin,
                      mixins.CreateModelMixin):
     serializer_class = AccountSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, )
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated, )
     queryset = Account.objects.all()
 
     def perform_create(self, serializer):
@@ -85,6 +90,7 @@ class AccountViewSet(viewsets.GenericViewSet,
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
+        logger_roistat.debug('Something went wrong!')
         return self.queryset.filter(user=self.request.user)
 
 
