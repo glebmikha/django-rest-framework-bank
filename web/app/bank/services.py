@@ -1,6 +1,5 @@
 from .models import Account, Transfer, Interest
 from django.db import transaction
-# from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 
 
@@ -44,31 +43,22 @@ def check_account_exists(account_id):
         account = Account.objects.get(pk=account_id)
     except Exception as e:
         print(e)
-        raise(ValueError('No such account'))
+        raise ValueError('No such account')
 
     return account
 
 
 def make_interest():
     accounts = Account.objects.all()
-
     for account in accounts:
-
         with transaction.atomic():
-
             pr = 0.08 / 12
-
             balance = float(account.balance)
-
             interest = balance * pr
-
             balance += interest
-
             account.balance = balance
-
             Interest.objects.create(
                 account=account,
                 amount=interest
             )
-
             account.save()
