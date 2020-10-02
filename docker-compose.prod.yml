@@ -44,7 +44,7 @@ services:
   db:
     image: postgres:10-alpine
     environment:
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=${SQL_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
