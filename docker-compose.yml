@@ -1,5 +1,12 @@
 version: "3"
 services:
+# добавил
+#  ubuntu:
+#    container_name: ubuntu
+#    image: ubuntu
+#    restart: on-failure
+#    command: ["sleep","infinity"]
+# добавил конец
   web:
     build: ./web
     ports:
@@ -41,7 +48,7 @@ services:
       - DEBUG=TRUE
 
   db:
-    image: postgres:10-alpine
+    image: postgres:16
     environment:
       - POSTGRES_PASSWORD=password
     volumes:

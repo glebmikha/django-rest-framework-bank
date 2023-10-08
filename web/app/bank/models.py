@@ -18,7 +18,7 @@ class Customer(models.Model):
     lname = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     house = models.CharField(max_length=255)
-    image = models.ImageField(null=True, upload_to=customer_image_file_path)
+    #image = models.ImageField(null=True, upload_to=customer_image_file_path)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
